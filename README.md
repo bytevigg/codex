@@ -22,6 +22,21 @@ youtube-buddy
 
 Type `hey youtube` (or your configured wake phrase) and press Enter to simulate wake phrase detection.
 
+## macOS auto-start installer (LaunchAgent)
+For a background-style setup that starts at login and primes browser automation permissions:
+
+```bash
+./scripts/install_macos_companion.sh
+```
+
+What it does:
+- Installs a per-user LaunchAgent (`com.youtubebuddy.assistant`) so the app starts automatically at login.
+- Enables `KeepAlive` so the process is relaunched if it exits.
+- Writes logs to `~/Library/Logs/YouTubeBuddy/`.
+- Triggers AppleScript permission prompts for Chrome/Safari (when possible).
+
+Use `./scripts/install_macos_companion.sh --dry-run` to preview generated files without loading the LaunchAgent.
+
 ## Config
 The app auto-creates `~/.youtube-buddy/config.json` on first run.
 
