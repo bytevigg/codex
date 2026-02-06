@@ -1,0 +1,33 @@
+[project]
+name = "youtube-buddy"
+version = "0.1.0"
+description = "macOS YouTube character companion MVP"
+requires-python = ">=3.11"
+dependencies = [
+  "openai>=1.51.0",
+  "mss>=9.0.1",
+  "pydantic>=2.9.2",
+  "Pillow>=10.4.0",
+]
+
+[project.optional-dependencies]
+audio = [
+  "sounddevice>=0.5.1",
+  "soundfile>=0.12.1",
+]
+
+[project.scripts]
+youtube-buddy = "youtube_buddy.app:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
