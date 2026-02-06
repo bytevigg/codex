@@ -1,0 +1,1 @@
+"""YouTube Buddy MVP package."""
