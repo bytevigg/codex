@@ -12,6 +12,9 @@ def _run_text_mode(orchestrator: SessionOrchestrator, wake_phrase: str) -> None:
         spoken = input("> ").strip().lower()
         if spoken in {"quit", "exit"}:
             break
+
+        orchestrator.warm_protagonist_state()
+
         if spoken != wake_phrase:
             continue
 
@@ -32,6 +35,7 @@ def _run_microphone_mode(
     print("YouTube Buddy started in microphone mode. Listening for wake phrase.")
     while True:
         try:
+            orchestrator.warm_protagonist_state()
             transcript = orchestrator.capture_and_transcribe_wake_phrase(
                 seconds=poll_seconds
             )
