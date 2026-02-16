@@ -28,12 +28,19 @@ class AIClient:
             out = self.client.audio.transcriptions.create(model="gpt-4o-mini-transcribe", file=f)
         return out.text.strip()
 
-    def generate_reply(self, user_text: str, screenshot_png: bytes) -> str:
+    def generate_reply(
+        self,
+        user_text: str,
+        screenshot_png: bytes,
+        protagonist_name: str | None = None,
+    ) -> str:
         image_data = base64.b64encode(screenshot_png).decode("ascii")
+        persona = protagonist_name or "The character"
         prompt = (
             f"Child said: {user_text!r}\n"
             f"Blocked topics: {', '.join(self.settings.blocked_topics)}\n"
-            "Respond in-character with what is likely on a YouTube kids screen."
+            f"Protagonist candidate: {persona}\n"
+            "Respond strictly in third-person (e.g. 'Bluey says ...') with what is likely on a YouTube kids screen."
         )
 
         resp = self.client.responses.create(
@@ -54,6 +61,25 @@ class AIClient:
             max_output_tokens=90,
         )
         return (resp.output_text or "Let's keep having fun and learning together!").strip()
+
+    def enforce_persona_contract(self, text: str, protagonist_name: str | None) -> str:
+        safe_name = (protagonist_name or "The character").strip()
+        normalized = " ".join(text.split()).strip()
+
+        lower = normalized.lower()
+        if lower.startswith("i "):
+            normalized = normalized[2:].strip().capitalize()
+        normalized = normalized.replace(" I ", " they ").replace(" I'm ", " they are ")
+
+        if " says " not in normalized.lower() and not normalized.lower().startswith(f"{safe_name.lower()} says"):
+            normalized = f"{safe_name} says {normalized}".strip()
+
+        max_words = max(10, self.settings.character.max_spoken_seconds * 3)
+        words = normalized.split()
+        if len(words) > max_words:
+            normalized = " ".join(words[:max_words]).rstrip(" ,") + "."
+
+        return normalized
 
     def speak(self, text: str) -> None:
         speech = self.client.audio.speech.create(
