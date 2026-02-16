@@ -23,6 +23,16 @@ class SessionOrchestrator:
             cooldown_seconds=settings.cooldown_seconds,
         )
 
+
+    def capture_and_transcribe_wake_phrase(self, seconds: float = 1.2) -> str:
+        audio_path = None
+        try:
+            audio_path = record_child_speech(seconds=max(0.4, seconds))
+            return self.ai.transcribe(audio_path)
+        finally:
+            if audio_path and audio_path.exists():
+                audio_path.unlink(missing_ok=True)
+
     def handle_trigger(self) -> str:
         now = datetime.now()
         if not self._within_active_hours(now):

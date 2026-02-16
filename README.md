@@ -20,7 +20,8 @@ export OPENAI_API_KEY=...
 youtube-buddy
 ```
 
-Type `hey youtube` (or your configured wake phrase) and press Enter to simulate wake phrase detection.
+By default, launcher mode is now microphone wake detection.
+For local terminal simulation, set `launcher.mode` to `"text"` in `~/.youtube-buddy/config.json` and type `hey youtube` (or your configured wake phrase).
 
 ## macOS auto-start installer (LaunchAgent)
 For a background-style setup that starts at login and primes browser automation permissions:
@@ -34,6 +35,8 @@ What it does:
 - Enables `KeepAlive` so the process is relaunched if it exits.
 - Writes logs to `~/Library/Logs/YouTubeBuddy/`.
 - Triggers AppleScript permission prompts for Chrome/Safari (when possible).
+- Creates/updates `~/.youtube-buddy/config.json` with beyond-MVP launcher defaults (`launcher.mode = "microphone"`).
+- Creates `~/.youtube-buddy/env` template for `OPENAI_API_KEY` (sourced at startup).
 
 Use `./scripts/install_macos_companion.sh --dry-run` to preview generated files without loading the LaunchAgent.
 
