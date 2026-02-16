@@ -62,6 +62,25 @@ class AIClient:
         )
         return (resp.output_text or "Let's keep having fun and learning together!").strip()
 
+    def enforce_persona_contract(self, text: str, protagonist_name: str | None) -> str:
+        safe_name = (protagonist_name or "The character").strip()
+        normalized = " ".join(text.split()).strip()
+
+        lower = normalized.lower()
+        if lower.startswith("i "):
+            normalized = normalized[2:].strip().capitalize()
+        normalized = normalized.replace(" I ", " they ").replace(" I'm ", " they are ")
+
+        if " says " not in normalized.lower() and not normalized.lower().startswith(f"{safe_name.lower()} says"):
+            normalized = f"{safe_name} says {normalized}".strip()
+
+        max_words = max(10, self.settings.character.max_spoken_seconds * 3)
+        words = normalized.split()
+        if len(words) > max_words:
+            normalized = " ".join(words[:max_words]).rstrip(" ,") + "."
+
+        return normalized
+
     def speak(self, text: str) -> None:
         speech = self.client.audio.speech.create(
             model="gpt-4o-mini-tts",

@@ -77,10 +77,13 @@ class SessionOrchestrator:
         self.telemetry.emit("wake_detected", video_id="unknown")
 
         if not self._within_active_hours(now):
+            failure_stage = "outside_active_hours"
             return "outside active hours"
         if not self.settings.enabled:
+            failure_stage = "disabled"
             return "disabled by config"
         if not self.limiter.can_interact(now):
+            failure_stage = "rate_limited"
             return "rate limit/cooldown active"
 
         self.state = SessionState.TRIGGERED
@@ -108,6 +111,7 @@ class SessionOrchestrator:
         try:
             self.state = SessionState.CAPTURING
             screenshot = capture_screen_png()
+            context = self._current_video_context(screenshot)
             audio_path = record_child_speech(seconds=3)
             transcript = self.ai.transcribe(audio_path)
 
@@ -146,6 +150,11 @@ class SessionOrchestrator:
             self.youtube.resume()
             self.state = SessionState.IDLE
             self.limiter.record(now)
+            self.telemetry.emit(
+                "turn_outcome",
+                success=turn_success,
+                failure_stage=(failure_stage or None),
+            )
 
     def _within_active_hours(self, now: datetime) -> bool:
         start, end = self.settings.active_hours
