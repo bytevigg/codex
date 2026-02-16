@@ -33,10 +33,15 @@ class Settings(BaseModel):
         events: list[str] = Field(
             default_factory=lambda: [
                 "wake_detected",
-                "pause_success",
                 "protagonist_confidence",
+                "protagonist_ready",
+                "pause_attempt",
+                "response_start",
+                "response_complete",
+                "resume_attempt",
+                "turn_outcome",
                 "response_latency_ms",
-                "resume_success",
+                "latency_slo",
             ]
         )
 
