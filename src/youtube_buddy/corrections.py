@@ -26,37 +26,21 @@ class CorrectionStore:
             return {}
         if not isinstance(raw, dict):
             return {}
-
         out: dict[str, float] = {}
         for key, value in raw.items():
             if isinstance(key, str) and isinstance(value, (int, float)):
                 out[key] = float(value)
         return out
 
-    @staticmethod
-    def preference_key(channel_id: str, series_hint: str, character_name: str) -> str:
-        channel = (channel_id or "unknown-channel").strip().lower()
-        series = (series_hint or "unknown-series").strip().lower()
-        character = (character_name or "unknown-character").strip().lower()
-        return f"{channel}::{series}::{character}"
-
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(json.dumps(self._data, indent=2, sort_keys=True), encoding="utf-8")
 
-    def boost_preference(
-        self,
-        channel_id: str,
-        series_hint: str,
-        character_name: str,
-        amount: float = 0.15,
-    ) -> None:
-        key = self.preference_key(channel_id, series_hint, character_name)
+    def boost(self, key: str, amount: float = 0.15) -> None:
         self._data[key] = self._data.get(key, 0.0) + amount
         self.save()
 
-    def preference_score(self, channel_id: str, series_hint: str, character_name: str) -> float:
-        key = self.preference_key(channel_id, series_hint, character_name)
+    def score(self, key: str) -> float:
         return self._data.get(key, 0.0)
 
 

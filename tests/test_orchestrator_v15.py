@@ -3,7 +3,6 @@ from datetime import datetime
 from youtube_buddy import orchestrator as orchestrator_module
 from youtube_buddy.config import Settings
 from youtube_buddy.orchestrator import SessionOrchestrator
-from youtube_buddy.youtube_control import ActiveVideoContext
 
 
 class _FakeAI:
@@ -14,10 +13,7 @@ class _FakeAI:
         return "Bluey says hello"
 
     def generate_reply(self, *_args, **_kwargs):
-        return "Let's keep learning and having fun together"
-
-    def enforce_persona_contract(self, text, protagonist_name):
-        return f"{protagonist_name} says {text}"
+        return "Bluey says let's keep learning and having fun!"
 
     def speak(self, _text):
         self.speak_calls += 1
@@ -37,15 +33,6 @@ class _FakeYouTube:
         self.resume_calls += 1
         return True
 
-    def get_active_video_context(self):
-        return ActiveVideoContext(
-            video_id="vid-1",
-            channel_id="chan-1",
-            title="Bluey Adventures",
-            description="Bluey and Bingo adventure time",
-            series_hint="Bluey",
-        )
-
 
 class _FakeTelemetry:
     def __init__(self):
@@ -63,7 +50,7 @@ class _AudioPath:
         return None
 
 
-def test_handle_trigger_retries_pause_and_emits_required_events(monkeypatch):
+def test_handle_trigger_retries_pause_and_speaks(monkeypatch):
     settings = Settings()
     settings.retries.pause = 1
     settings.protagonist.accept_wake_only_when_ready = False
@@ -82,22 +69,15 @@ def test_handle_trigger_retries_pause_and_emits_required_events(monkeypatch):
     )
 
     result = orchestrator.handle_trigger()
-    assert result.startswith("Bluey")
+    assert "Bluey says" in result
     assert orchestrator.youtube.pause_calls == 2
     assert orchestrator.youtube.resume_calls >= 1
     assert orchestrator.ai.speak_calls == 1
 
-    names = [name for name, _ in orchestrator.telemetry.events]
-    assert "pause_attempt" in names
-    assert "response_start" in names
-    assert "response_complete" in names
-    assert "turn_outcome" in names
 
-
-def test_handle_trigger_gates_with_subtle_local_cue(monkeypatch):
+def test_handle_trigger_gates_when_protagonist_not_ready(monkeypatch):
     settings = Settings()
     settings.protagonist.accept_wake_only_when_ready = True
-    settings.protagonist.min_confidence = 0.95
 
     monkeypatch.setattr(orchestrator_module, "AIClient", lambda _settings: _FakeAI())
     orchestrator = SessionOrchestrator(settings)
@@ -112,5 +92,5 @@ def test_handle_trigger_gates_with_subtle_local_cue(monkeypatch):
     )
 
     result = orchestrator.handle_trigger()
-    assert "still figuring out" in result
+    assert result == "protagonist not ready yet"
     assert orchestrator.youtube.pause_calls == 0

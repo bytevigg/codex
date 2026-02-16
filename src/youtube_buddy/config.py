@@ -38,7 +38,7 @@ class Settings(BaseModel):
                 "pause_attempt",
                 "response_start",
                 "response_complete",
-                "resume_attempt",
+                "resume_success",
                 "turn_outcome",
                 "response_latency_ms",
                 "latency_slo",
