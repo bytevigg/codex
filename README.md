@@ -41,3 +41,5 @@ Use `./scripts/install_macos_companion.sh --dry-run` to preview generated files 
 The app auto-creates `~/.youtube-buddy/config.json` on first run.
 
 Plan doc: `docs/mvp_macos_youtube_character_companion.md`
+
+Beyond-MVP spec: `docs/v1_5_beyond_mvp_spec.md`
