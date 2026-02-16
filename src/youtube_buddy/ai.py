@@ -28,12 +28,19 @@ class AIClient:
             out = self.client.audio.transcriptions.create(model="gpt-4o-mini-transcribe", file=f)
         return out.text.strip()
 
-    def generate_reply(self, user_text: str, screenshot_png: bytes) -> str:
+    def generate_reply(
+        self,
+        user_text: str,
+        screenshot_png: bytes,
+        protagonist_name: str | None = None,
+    ) -> str:
         image_data = base64.b64encode(screenshot_png).decode("ascii")
+        persona = protagonist_name or "The character"
         prompt = (
             f"Child said: {user_text!r}\n"
             f"Blocked topics: {', '.join(self.settings.blocked_topics)}\n"
-            "Respond in-character with what is likely on a YouTube kids screen."
+            f"Protagonist candidate: {persona}\n"
+            "Respond strictly in third-person (e.g. 'Bluey says ...') with what is likely on a YouTube kids screen."
         )
 
         resp = self.client.responses.create(
