@@ -43,6 +43,10 @@ Use `./scripts/install_macos_companion.sh --dry-run` to preview generated files 
 ## Config
 The app auto-creates `~/.youtube-buddy/config.json` on first run.
 
+## iOS app
+
+An iOS port lives in the [`ios/`](ios/) directory. It replaces AppleScript with an embedded YouTube WKWebView, uses `SFSpeechRecognizer` for on-device wake phrase detection, and provides a native SwiftUI settings screen for parent controls. See [`ios/README.md`](ios/README.md) for setup instructions.
+
 Plan doc: `docs/mvp_macos_youtube_character_companion.md`
 
 Beyond-MVP spec: `docs/v1_5_beyond_mvp_spec.md`

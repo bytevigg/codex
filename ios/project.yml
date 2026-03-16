@@ -1,0 +1,27 @@
+name: YouTubeBuddy
+options:
+  bundleIdPrefix: com.youtubebuddy
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.0"
+
+targets:
+  YouTubeBuddy:
+    type: application
+    platform: iOS
+    sources:
+      - YouTubeBuddyApp
+      - Models
+      - Services
+      - Orchestrator
+      - Views
+      - Resources
+    settings:
+      base:
+        INFOPLIST_FILE: YouTubeBuddyApp/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.youtubebuddy.app
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: false
