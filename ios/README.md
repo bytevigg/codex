@@ -17,7 +17,7 @@ You can either:
 **Option A — XcodeGen (recommended):**
 ```bash
 brew install xcodegen
-cd YouTubeBuddy
+cd ios
 xcodegen generate
 open YouTubeBuddy.xcodeproj
 ```
@@ -42,6 +42,44 @@ private static let apiKey = "YOUR_OPENAI_API_KEY_HERE"
 ### 3. Build & Run
 
 Select a physical device (microphone required) and hit Run.
+
+## Build the `.ipa` for App Store upload
+
+You cannot generate an App Store upload artifact from Linux; this must be done on **macOS with Xcode** and an Apple Developer account configured for signing.
+
+### Fast path
+
+From the repo root on macOS:
+
+```bash
+APPLE_TEAM_ID=YOURTEAMID ./ios/scripts/build_app_store_ipa.sh
+```
+
+That script will:
+- generate `ios/YouTubeBuddy.xcodeproj` from `ios/project.yml`
+- archive the app for generic iOS devices
+- export an App Store-ready package to `ios/build/app-store/`
+
+Expected output:
+
+```bash
+ios/build/app-store/YouTubeBuddy.ipa
+```
+
+### Manual Xcode archive/export flow
+
+1. Open `ios/YouTubeBuddy.xcodeproj` in Xcode.
+2. Set your signing team under **Signing & Capabilities**.
+3. Choose **Any iOS Device (arm64)** or a generic iOS destination.
+4. Click **Product → Archive**.
+5. In the Organizer window, choose **Distribute App**.
+6. Select **App Store Connect** → **Upload** to upload directly, or **Export** to save the `.ipa` locally.
+
+### Notes before App Store submission
+
+- Replace the hardcoded API key in `Services/AIClient.swift` before shipping.
+- Add your real bundle identifier and signing team.
+- Provide required App Store assets such as app icon, screenshots, privacy details, and age rating metadata in App Store Connect.
 
 ## How it works
 
